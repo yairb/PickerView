@@ -1,0 +1,40 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:custom="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".DemoActivity">
+
+    <LinearLayout
+        android:id="@+id/upperLine"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:orientation="horizontal">
+
+        <com.yair.pickerview.PickerView
+            android:id="@+id/pickerView1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="#ffebffbc" />
+
+        <com.yair.pickerview.PickerView
+            android:id="@+id/pickerView2"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="#ff37ff39"
+            custom:array="@array/months"
+            custom:selectorColor="#72906684" />
+    </LinearLayout>
+
+
+    <com.yair.pickerview.PickerView
+        android:id="@+id/pickerView3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_below="@id/upperLine"
+        android:background="#ff9eb4ff"
+        custom:selectorColor="#72177b90" />
+</RelativeLayout>
