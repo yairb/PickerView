@@ -17,7 +17,7 @@ public class DemoActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_demo);
 
-
+ 
         PickerView picker1 = (PickerView)findViewById(R.id.pickerView1);
 
         ArrayList<String> items = new ArrayList<>();
