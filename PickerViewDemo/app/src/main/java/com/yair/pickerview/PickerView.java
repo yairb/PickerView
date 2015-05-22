@@ -23,15 +23,14 @@ import java.util.Arrays;
  * Created by yair on 5/17/15.
  */
 public class PickerView extends RelativeLayout {
-    private LayoutInflater inflater;
     private ListView listView = null;
-    private View chooser = null;
+    private View selector = null;
     private PickerListAdapter adapter = null;
     private Context context;
 
     private boolean setListView = false;
-    private int showCells, middleCell, cellHeight, firstVisibleItem = 0;
-    private View thisView;
+    private int itemsToShow, middleCell, cellHeight, firstVisibleItem = 0;
+    // set default selector color
     private int selectorColor = Color.parseColor("#116b2b66");
 
     private ArrayList<String> array = null;
@@ -60,6 +59,11 @@ public class PickerView extends RelativeLayout {
                     array = new ArrayList<String>(Arrays.asList(arr));
 
                     break;
+                case R.styleable.PickerView_itemsToShow:
+                    // how many items will be in seen in listView. should be define in @dimen
+                    // to fit different devices.
+                    itemsToShow = a.getInt(attr, 5);
+                    break;
                 default:
                     break;
             }
@@ -80,16 +84,17 @@ public class PickerView extends RelativeLayout {
         this.context = context;
 
 //        View.inflate(context, R.layout.picker_view, this);
-        inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        thisView = inflater.inflate(R.layout.picker_view, this, true);
+        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View thisView = inflater.inflate(R.layout.picker_view, this, true);
 //        this.addView(thisView);
 
 
         listView = (ListView) findViewById(R.id.listview);
-        chooser = findViewById(R.id.chooser);
+        selector = findViewById(R.id.chooser);
 
-        chooser.setBackgroundColor(selectorColor);
+        selector.setBackgroundColor(selectorColor);
 
+        // if we got the array from resources - set it now
         if (array != null) {
             setList(array);
         }
@@ -97,69 +102,54 @@ public class PickerView extends RelativeLayout {
 
     public void setList(ArrayList<String> items) {
         adapter = new PickerListAdapter(context, R.layout.list_item, items);
-//        listView.setAdapter(adapter);
     }
 
-//    @Override
-//    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-//
-//        //At this time we need to call setMeasuredDimensions(). Lets just
-//        //call the parent View's method
-//        //(see https://github.com/android/platform_frameworks_base/blob/master/core/java/android/view/View.java)
-//        //that does:
-//        //setMeasuredDimension(getDefaultSize(
-//        //                       getSuggestedMinimumWidth(), widthMeasureSpec),
-//        //                    getDefaultSize(
-//        //                       getSuggestedMinimumHeight(), heightMeasureSpec));
-//        //
-//
-//        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-//        int wspec = MeasureSpec.makeMeasureSpec(
-//                getMeasuredWidth() / getChildCount(), MeasureSpec.EXACTLY);
-//        int hspec = MeasureSpec.makeMeasureSpec(
-//                getMeasuredHeight(), MeasureSpec.EXACTLY);
-//        for (int i = 0; i < getChildCount(); i++) {
-//            View v = getChildAt(i);
-//            v.measure(wspec, hspec);
-//        }
-//    }
 
+    // get selected item
+    public String getSelected(){
+        if (adapter == null){
+            return "";
+        }else{
+            return adapter.getItem(firstVisibleItem + itemsToShow / 2);
+        }
+    }
 
-//    @Override
-//    protected void onLayout(boolean changed, int l, int t, int r, int b) {
-//        for (int i = 0; i < getChildCount(); i++) {
-//            getChildAt(i).layout(l, t, r, b);
-//        }
-//
-//    }
+    // get selected item position
+    public int getSelectedIndex(){
+        if (adapter == null){
+            return 0;
+        }else{
+            return firstVisibleItem + itemsToShow / 2;
+        }
+    }
 
     @Override
     public void onWindowFocusChanged(boolean hasWindowFocus) {
         super.onWindowFocusChanged(hasWindowFocus);
-        // we set the years listView here, because we need to calculate the cells size, only
+        // we set the listView here, because we need to calculate the cells size, only
         // after listView already has height
         if (!setListView && adapter != null) {
-            showCells = 5; // (int)getResources().getInteger(R.integer.years_show_cells);
+            itemsToShow = 5; // (int)getResources().getInteger(R.integer.years_show_cells);
             setListView = true;
 
 
             int height = listView.getHeight();
-            cellHeight = height / showCells;
+            cellHeight = height / itemsToShow;
 
-            middleCell = showCells / 2;
+            middleCell = itemsToShow / 2;
 
 
-            // set the chooser rect on the middle cell, by the top margin
+            // set the selector rect on the middle cell, by the top margin
 
-            if (chooser.getLayoutParams() instanceof ViewGroup.MarginLayoutParams) {
-                ViewGroup.MarginLayoutParams p = (ViewGroup.MarginLayoutParams) chooser.getLayoutParams();
+            if (selector.getLayoutParams() instanceof ViewGroup.MarginLayoutParams) {
+                ViewGroup.MarginLayoutParams p = (ViewGroup.MarginLayoutParams) selector.getLayoutParams();
                 p.height = cellHeight;
                 p.setMargins(0, cellHeight * middleCell, 0, 0);
-                chooser.requestLayout();
+                selector.requestLayout();
             }
 
             // adding empty cells on top and bottom
-            adapter.addEmpties(showCells / 2);
+            adapter.addEmpties(itemsToShow / 2);
 
 
             listView.setAdapter(adapter);
@@ -210,12 +200,11 @@ public class PickerView extends RelativeLayout {
         public PickerListAdapter(Context context, int textViewResourceId,
                                  ArrayList<String> sList) {
             super(context, textViewResourceId, sList);
-
-
             items = sList;
 
         }
-
+        // to enable choosing of EVERY item, we need to add on top and bottom the list empty
+        // items, so the user will be able scrolling there
         public void addEmpties(int size) {
             for (int i = 0; i < size; i++) {
                 items.add("");
@@ -267,18 +256,16 @@ public class PickerView extends RelativeLayout {
 
             if (holder != null) {
                 holder.text.setText("" + items.get(position));
-//                holder.text.setHeight(80);
+
+
+                if (holder.text.getLayoutParams() instanceof ViewGroup.MarginLayoutParams) {
+                    ViewGroup.MarginLayoutParams p = (ViewGroup.MarginLayoutParams) holder.text.getLayoutParams();
+                    p.height = cellHeight;
+                    holder.text.setLayoutParams(p);
+                    holder.text.requestLayout();
+
+                }
             }
-
-
-            if (holder.text.getLayoutParams() instanceof ViewGroup.MarginLayoutParams) {
-                ViewGroup.MarginLayoutParams p = (ViewGroup.MarginLayoutParams) holder.text.getLayoutParams();
-                p.height = cellHeight;
-                holder.text.setLayoutParams(p);
-                holder.text.requestLayout();
-
-            }
-
             return convertView;
 
         }
