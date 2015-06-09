@@ -3,5 +3,6 @@
     <declare-styleable name="PickerView">
         <attr name="array" format="integer"/>
         <attr name="selectorColor" format="string"/>
+        <attr name="itemsToShow" format="integer"/>
     </declare-styleable>
 </resources>
