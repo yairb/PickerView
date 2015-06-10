@@ -29,7 +29,7 @@ public class PickerView extends RelativeLayout {
     private Context context;
 
     private boolean setListView = false;
-    private int itemsToShow, middleCell, cellHeight, firstVisibleItem = 0;
+    private int itemsToShow = 3, middleCell, cellHeight, firstVisibleItem = 0;
     // set default selector color
     private int selectorColor = Color.parseColor("#116b2b66");
 
@@ -83,10 +83,8 @@ public class PickerView extends RelativeLayout {
 
         this.context = context;
 
-//        View.inflate(context, R.layout.picker_view, this);
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View thisView = inflater.inflate(R.layout.picker_view, this, true);
-//        this.addView(thisView);
+        inflater.inflate(R.layout.picker_view, this, true);
 
 
         listView = (ListView) findViewById(R.id.listview);
@@ -123,13 +121,13 @@ public class PickerView extends RelativeLayout {
         }
     }
 
+
     @Override
     public void onWindowFocusChanged(boolean hasWindowFocus) {
         super.onWindowFocusChanged(hasWindowFocus);
         // we set the listView here, because we need to calculate the cells size, only
         // after listView already has height
         if (!setListView && adapter != null) {
-            itemsToShow = 5; // (int)getResources().getInteger(R.integer.years_show_cells);
             setListView = true;
 
 
